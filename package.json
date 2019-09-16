@@ -1,0 +1,28 @@
+{
+	"name": "c0lorize",
+	"version": "0.0.1",
+	"description": "simple node script to convert a text file to colors for motd or other irc ascii art",
+	"author": "z0",
+	"main": "c0lorize.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/z0mbieparade/c0lorize"
+	},
+	"bugs": {
+		"url": "https://github.com/z0mbieparade/c0lorize/issues"
+	},
+	"keywords": [
+		"irc",
+		"colors",
+		"ascii",
+		"ansi",
+		"motd"
+	],
+	"dependencies": {
+		"prompt": "~1.0.0"
+	},
+	"preferGlobal": false,
+	"private": true,
+	"analyze": false,
+	"license": "MIT"
+}
