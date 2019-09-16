@@ -22,7 +22,14 @@ prompt.get({
 
 	fs.readFile(filename, 'utf8', function(err, data) {
 		if (err) throw err;
-		console.log('OK: ' + filename);
+		format("&b&cyanOK: " + filename);
+
+		if(filename !== 'test.txt')
+		{
+			format("&b&limePlease note: the colors you see below are an approximation.");
+			format("&i&pinkDifferent IRC clients display colors differently. (as do different terminals.");
+		}
+	
 		console.log('\x1b[0m', '------------------ START FILE ------------------ ');
 
 		var lines = data.split(/\r?\n/);
@@ -31,7 +38,7 @@ prompt.get({
 		fs.writeFile(name + '_c0lor.txt', new_data, function(err, data) {
 			if (err) throw err;
 			console.log('\x1b[0m', '------------------ END FILE ------------------ ');
-			console.log('file saved: ' + name + '_c0lor.txt');
+			format("&b&cyanSAVED: " + name + '_c0lor.txt');
 		});
 	});
 });
