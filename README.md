@@ -1,3 +1,4 @@
+![c0lorize](img.png "image of steps to colorize an ascii text file")
 
 # c0lorize
 Needed a little script to make generating things like irc MOTD's easier. Somewhat based off of [irc-colors](https://www.npmjs.com/package/irc-colors).
