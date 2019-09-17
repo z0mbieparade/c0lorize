@@ -113,7 +113,8 @@ var init = function()
 		split('&r  ------------------ START FILE ------------------');
 
 		var txt_data = '';
-		var html_data = '<!DOCTYPE html><head><style>' + style_str + '</style><title>' + name + '</title></head><body>\n';
+		var html_data = '<!DOCTYPE html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n';
+			html_data += '<style>' + style_str + '</style>\n<title>' + name + '</title>\n</head>\n<body>\n';
 
 		open_tag_count = 0;
 		data.split(/\r?\n/).forEach(function(str, line)
@@ -137,7 +138,7 @@ var init = function()
 			open_tag_count = 0;
 		}
 
-		html_data += '</body></html>';
+		html_data += '</body>\n</html>';
 
 		write_txt(name, txt_data, function(){
 			split('&r  ------------------ END FILE ------------------');
