@@ -96,7 +96,7 @@ prompt.get({
 		split('&r  ------------------ START FILE ------------------');
 
 		var lines = data.split(/\r?\n/);
-		var new_data = lines.map(split)
+		var new_data = lines.map(split).join('');
 
 		fs.writeFile(name + '_c0lor.txt', new_data, function(err, data) {
 			if (err) throw err;
@@ -115,7 +115,7 @@ var split = function(str, line)
 	if(!str)
 	{
 		console.log(str);
-		return str;
+		return '\n';
 	}
 
 	if(reset)
@@ -125,14 +125,12 @@ var split = function(str, line)
 	}
 
 	let txt_str = '',
-		con_str = '',
-		debug_arr = [];
+		con_str = '';
 
 	let str_split = str.split(format_regex).forEach(function(x)
 	{
 		if(x)
 		{
-			debug_arr.push(x);
 			if(x.match(/^&/) && search[x])
 			{
 				if(search[x].type === 'fg')
@@ -142,7 +140,6 @@ var split = function(str, line)
 
 					txt_str += search[x].unicode;
 					con_str += search[x].esc;
-
 				}
 				else if(search[x].type === 'bg')
 				{
@@ -191,8 +188,6 @@ var split = function(str, line)
 
 	txt_str += '\n';
 
-	//console.log(debug_arr)
 	console.log(con_str);
-
 	return txt_str;
 }
