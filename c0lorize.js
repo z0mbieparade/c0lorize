@@ -3,7 +3,8 @@
 const 	prompt	   	= require('prompt'),
 		fs 			= require('fs');
 
-let 	reset = true,
+let 	filename = 'test.txt',
+		reset = true,
 		search = {},
 		fg_arr = [],
 		bg_arr = [],
@@ -58,17 +59,23 @@ styles.forEach(function(s, i)
 let format_str = fg_arr.join('|&') + '|&bg' + bg_arr.join('|&bg') + '|&' + style_arr.join('|&');
 let format_regex = new RegExp('(&' + format_str + ')(?=.)*', 'g')
 
+if(process.argv && process.argv.length > 2)
+{
+	filename = process.argv[2];
+	reset = process.argv[3] === undefined ? true : (process.argv[3] === 'false' ? false : true);
+}
+
 prompt.start();
 prompt.get({
 	"properties": {
 		"file": {
 			"description": "where the file is located you want to color",
-			"default": "test.txt",
+			"default": filename,
 			"required": true
 		},
 		"reset": {
 			"description": "add a reset at the end of every line with colors or style",
-			"default": true,
+			"default": reset,
 			"type": "boolean",
 			"required": true
 		}

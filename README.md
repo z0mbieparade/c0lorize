@@ -46,4 +46,11 @@ Check out the test.txt file for examples. Once you're done you can run:
 ```
 node c0lorize.js
 ```
-You will be prompted for the file name. The default is test.txt in the c0lorize folder. It will then run and replace all your color codes with the correct escape codes and resave it in the same location as test_c0lorize.txt.
+You will be prompted for the file name and if you would like to reset color codes after each line. The default is test.txt in the c0lorize folder. It will then run and replace all your color codes with the correct escape codes and resave it in the same location as test_c0lorize.txt.
+
+Optionally, you can also type:
+
+```
+node c0lorize.js somefile.txt true/false
+```
+This will pre-populate the prompts and it can make it a bit easier if you're repetitively re-running the script to make tweaks.
