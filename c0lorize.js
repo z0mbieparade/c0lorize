@@ -5,6 +5,7 @@ const 	prompt	   	= require('prompt'),
 
 let 	filename = 'test.txt',
 		reset = true,
+		correct = true,
 		search = {},
 		fg_arr = [],
 		bg_arr = [],
@@ -76,6 +77,12 @@ prompt.get({
 		"reset": {
 			"description": "add a reset at the end of every line with colors or style",
 			"default": reset,
+			"type": "boolean",
+			"required": true
+		},
+		"correct": {
+			"description": "some irc clients ignore double slashes \\\\ attempt to correct?",
+			"default": true,
 			"type": "boolean",
 			"required": true
 		}
@@ -186,6 +193,11 @@ var split = function(str, line)
 			}
 		}
 	})
+
+	if(correct)
+	{
+		txt_str = txt_str.replace(/\\/g,'\\\\');
+	}
 
 	if(reset && (current_style.fg !== null || current_style.bg !== null))
 	{
