@@ -6,10 +6,20 @@ const 	prompt	   	= require('prompt'),
 let 	filename = 'test.txt',
 		reset = true,
 		correct = true,
+		html = false,
+		open_tag_count 	= 0,
 		search = {},
 		fg_arr = [],
 		bg_arr = [],
-		style_arr = [];
+		style_arr = [],
+		html_style = {
+			'body': { 'font-family': 'monospace', 'white-space': 'pre', 'font-size': '14px', 'line-height': '16px' },
+			'.b': { 'font-weight': 'bold' },
+			'.i': { 'font-style': 'italic' },
+			'.u': { 'text-decoration': 'underline' },
+			'.r': { 'color': 'initial', 'background-color': 'initial','font-weight': 'normal', 'font-style': 'initial', 'text-decoration': 'none' } 
+		},
+		style_str = '';
 
 let colors = [
 	{ unicode: '\u00030',  irc: '00', term: 37, match: ['0', 'white'] },
@@ -21,26 +31,30 @@ let colors = [
 	{ unicode: '\u00036',  irc: '06', term: 35, match: ['6', 'purple', 'violet'] },
 	{ unicode: '\u00037',  irc: '07', term: 33, match: ['7', 'olive', 'orange'] },
 	{ unicode: '\u00038',  irc: '08', term: 93, match: ['8', 'yellow'] },
-	{ unicode: '\u00039',  irc: '09', term: 92, match: ['9', 'lightgreen', 'lime'] },
+	{ unicode: '\u00039',  irc: '09', term: 92, match: ['9', 'lime', 'lightgreen'] },
 	{ unicode: '\u000310', irc: '10', term: 36, match: ['10', 'teal'] },
 	{ unicode: '\u000311', irc: '11', term: 96, match: ['11', 'cyan', 'aqua'] },
 	{ unicode: '\u000312', irc: '12', term: 94, match: ['12', 'blue', 'royal'] },
-	{ unicode: '\u000313', irc: '13', term: 95, match: ['13', 'pink', 'lightpurple', 'fuchsia'] },
+	{ unicode: '\u000313', irc: '13', term: 95, match: ['13', 'fuchsia', 'pink', 'lightpurple'] },
 	{ unicode: '\u000314', irc: '14', term: 90, match: ['14', 'gray', 'grey'] },
 	{ unicode: '\u000315', irc: '15', term: 37, match: ['15', 'lightgray', 'lightgrey', 'silver'] }
 ].reverse();
 
 let styles = [
-	{ unicode: '\u001f', term: 4, match: ['underline', 'u'] },
-	{ unicode: '\u0016', term: 3, match: ['italic', 'i'] },
-	{ unicode: '\u0002', term: 1, match: ['bold', 'b'] },
-	{ unicode: '\u000f', term: 0, match: ['reset', 'r'] }
+	{ unicode: '\u001f', irc: 'u', term: 4, match: ['underline', 'u'] },
+	{ unicode: '\u0016', irc: 'i',  term: 3, match: ['italic', 'i'] },
+	{ unicode: '\u0002', irc: 'b',  term: 1, match: ['bold', 'b'] },
+	{ unicode: '\u000f', irc: 'r',  term: 0, match: ['reset', 'r'] }
 ]
 
 colors.forEach(function(c, i)
 {
 	fg_arr.push(c.match.join('|&'));
 	bg_arr.push(c.match.join('|&bg'));
+
+	html_style['.fg' + c.irc] = { 'color': c.match[1] };
+	html_style['.bg' + c.irc] = { 'background-color': c.match[1] };
+
 	c.match.forEach(function(m)
 	{
 		search['&' + m] = { unicode: c.unicode, irc: c.irc, esc: '\x1b[' + c.term + 'm', type: 'fg'}
@@ -53,9 +67,21 @@ styles.forEach(function(s, i)
 	style_arr.push(s.match.join('|&'));
 	s.match.forEach(function(m)
 	{
-		search['&' + m] = { unicode: s.unicode, esc: '\x1b[' + s.term + 'm', type: 'style' };
+		search['&' + m] = { unicode: s.unicode, irc: s.irc, esc: '\x1b[' + s.term + 'm', type: 'style' };
 	})
 })
+
+for(var key in html_style)
+{
+	style_str += key + '{';
+
+	for(var attr in html_style[key])
+	{
+		style_str += attr + ': ' + html_style[key][attr] + ';'
+	}
+
+	style_str += '}\n';
+}
 
 let format_str = fg_arr.join('|&') + '|&bg' + bg_arr.join('|&bg') + '|&' + style_arr.join('|&');
 let format_regex = new RegExp('(&' + format_str + ')(?=.)*', 'g')
@@ -64,35 +90,12 @@ if(process.argv && process.argv.length > 2)
 {
 	filename = process.argv[2];
 	reset = process.argv[3] === undefined ? true : (process.argv[3] === 'false' ? false : true);
+	correct = process.argv[4] === undefined ? true : (process.argv[4] === 'false' ? false : true);
+	html = process.argv[5] === undefined ? false : (process.argv[5] === 'true' ? true : false);
 }
 
-prompt.start();
-prompt.get({
-	"properties": {
-		"file": {
-			"description": "where the file is located you want to color",
-			"default": filename,
-			"required": true
-		},
-		"reset": {
-			"description": "add a reset at the end of every line with colors or style",
-			"default": reset,
-			"type": "boolean",
-			"required": true
-		},
-		"correct": {
-			"description": "some irc clients ignore double slashes \\\\ attempt to correct?",
-			"default": true,
-			"type": "boolean",
-			"required": true
-		}
-	}
-}, function (err, result) {
-	if (err) throw err;
-
-	let filename = result.file;
-		reset = result.reset;
-
+var init = function()
+{
 	let file_arr = filename.split('.');
 	let ext = file_arr.splice(file_arr.length - 1, 1)[0];
 	let name = file_arr.join('.');
@@ -109,27 +112,74 @@ prompt.get({
 	
 		split('&r  ------------------ START FILE ------------------');
 
-		var lines = data.split(/\r?\n/);
-		var new_data = lines.map(split).join('');
+		var txt_data = '';
+		var html_data = '<!DOCTYPE html><head><style>' + style_str + '</style><title>' + name + '</title></head><body>\n';
 
-		fs.writeFile(name + '_c0lor.txt', new_data, function(err, data) {
-			if (err) throw err;
+		open_tag_count = 0;
+		data.split(/\r?\n/).forEach(function(str, line)
+		{
+			var formated = split(str, line);
+
+			txt_data += formated.txt;
+
+			if(html)
+			{
+				html_data += formated.html;
+			}
+		});
+
+		if(!reset)
+		{
+			for(var i = 0; i < open_tag_count; i++)
+			{
+				html_data += '</span>';
+			}
+			open_tag_count = 0;
+		}
+
+		html_data += '</body></html>';
+
+		write_txt(name, txt_data, function(){
 			split('&r  ------------------ END FILE ------------------');
 			split("&b&cyanSAVED: " + name + '_c0lor.txt&r');
-		});
+
+			if(html)
+			{
+				write_html(name, html_data, function()
+				{
+					split("&b&cyanSAVED: " + name + '_c0lor.html&r');
+				})
+			}
+		})
 	});
-});
+}
 
+var write_txt = function(name, data, callback)
+{
+	fs.writeFile(name + '_c0lor.txt', data, function(err, data) {
+		if (err) throw err;
+		callback();
+	});
+}
 
-let current_style = {fg: null, bg: null},
-	since_last_fg = null;
+var write_html = function(name, data, callback)
+{
+	fs.writeFile(name + '_c0lor.html', data, function(err, data) {
+		if (err) throw err;
+		callback();
+	});
+}
+
+ //we need to track the last fg color, because unicode can't do a bg color without one.
+let current_style 	= {fg: null, bg: null},
+	since_last_fg 	= null;
 
 var split = function(str, line)
 {
 	if(!str)
 	{
 		console.log(str);
-		return '\n';
+		return {txt: '\n', html: '<br />\n'};
 	}
 
 	if(reset)
@@ -139,9 +189,10 @@ var split = function(str, line)
 	}
 
 	let txt_str = '',
+		html_str = '',
 		con_str = '';
 
-	let str_split = str.split(format_regex).forEach(function(x)
+	str.split(format_regex).forEach(function(x)
 	{
 		if(x)
 		{
@@ -154,6 +205,8 @@ var split = function(str, line)
 
 					txt_str += search[x].unicode;
 					con_str += search[x].esc;
+					html_str += '<span class="fg' + search[x].irc + '">';
+					open_tag_count++;
 				}
 				else if(search[x].type === 'bg')
 				{
@@ -175,6 +228,9 @@ var split = function(str, line)
 						txt_str += '\u00031,' + search[x].irc;
 						con_str += '\x1b[30m' + search[x].esc;
 					}
+
+					html_str += '<span class="bg' + search[x].irc + '">';
+					open_tag_count++;
 				}
 				else
 				{
@@ -182,6 +238,8 @@ var split = function(str, line)
 
 					txt_str += search[x].unicode;
 					con_str += search[x].esc;
+					html_str += '<span class="' + search[x].irc + '">';
+					open_tag_count++;
 				}
 			}
 			else
@@ -190,6 +248,7 @@ var split = function(str, line)
 
 				txt_str += x;
 				con_str += x;
+				html_str += x;
 			}
 		}
 	})
@@ -203,10 +262,61 @@ var split = function(str, line)
 	{
 		txt_str += '\u000f';
 		con_str += '\x1b[0m';
+
+		for(var i = 0; i < open_tag_count; i++)
+		{
+			html_str += '</span>';
+		}
 	}
 
 	txt_str += '\n';
+	html_str += '<br />';
 
 	console.log(con_str);
-	return txt_str;
+	return {txt: txt_str, html: html_str};
+}
+
+if(process.argv.length < 6) //skip prompt if args are in cmd line
+{
+	prompt.start();
+	prompt.get({
+		"properties": {
+			"file": {
+				"description": "where the file is located you want to color",
+				"default": filename,
+				"required": true
+			},
+			"reset": {
+				"description": "add a reset at the end of every line with colors or style",
+				"default": reset,
+				"type": "boolean",
+				"required": true
+			},
+			"correct": {
+				"description": "some irc clients ignore double slashes \\\\ attempt to correct?",
+				"default": correct,
+				"type": "boolean",
+				"required": true
+			},
+			"html": {
+				"description": "would you like to generate HTML also?",
+				"default": html,
+				"type": "boolean",
+				"required": true
+			}
+		}
+	}, function (err, result) {
+		if (err) throw err;
+
+		filename 	= result.file,
+		reset 		= result.reset,
+		correct 	= result.correct,
+		html 		= result.html;
+
+		init();
+	});
+}
+else
+{
+	init();
 }
