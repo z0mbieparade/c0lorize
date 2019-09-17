@@ -1,3 +1,4 @@
+
 # c0lorize
 Needed a little script to make generating things like irc MOTD's easier. Somewhat based off of [irc-colors](https://www.npmjs.com/package/irc-colors).
 
@@ -11,6 +12,9 @@ npm install
 ## To Use
 
 add an ascii text file to the c0lorize directory that you want to color. c0lorize will replace the following strings:
+
+### Colors
+Any of the following color strings can be modified with &bg[color] to make it a background color, i.e: &white&bgblack would make white text on a black background.
 
 - &0, &white 
 - &1, &black 
@@ -28,6 +32,8 @@ add an ascii text file to the c0lorize directory that you want to color. c0loriz
 - &13, &pink, &lightpurple, &fuchsia
 - &14, &gray, &grey
 - &15, &lightgray, &lightgrey, &silver
+
+### Styles
 - &u, &underline
 - &i, &italic
 - &b, &bold
