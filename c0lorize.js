@@ -271,7 +271,7 @@ var split = function(str, line)
 	}
 
 	txt_str += '\n';
-	html_str += '<br />';
+	html_str += '<br />\n';
 
 	console.log(con_str);
 	return {txt: txt_str, html: html_str};
