@@ -1,5 +1,5 @@
 .DS_Store
 package-lock.json
 node_modules/*
-test_c0lor.txt
+*_c0lor.txt
 package-lock.json
