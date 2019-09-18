@@ -13,7 +13,7 @@ let 	filename = 'test.txt',
 		bg_arr = [],
 		style_arr = [],
 		html_style = {
-			'body': { 'font-family': 'monospace', 'white-space': 'pre', 'font-size': '14px', 'line-height': '16px' },
+			'body': { 'font-family': 'monospace', 'white-space': 'pre', 'font-size': '14px', 'line-height': '8px' },
 			'.b': { 'font-weight': 'bold' },
 			'.i': { 'font-style': 'italic' },
 			'.u': { 'text-decoration': 'underline' },
