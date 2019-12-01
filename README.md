@@ -51,7 +51,8 @@ You will be prompted for:
 - The file name (The default is test.txt in the c0lorize folder.) 
 - If you would like to reset styling after each line
 - If you would like to fix a bug with some irc clients viewing \\\ as \
-- If you would also like to generate an html file
+- If you would also like to generate an HTML file
+- If you would like to validate that HTML file (only asked if previous question is true)
 
 It will then run and replace all your color codes with the correct escape codes and resave it in the same location as test_c0lorize.txt.
 
