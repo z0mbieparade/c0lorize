@@ -1,6 +1,6 @@
 {
 	"name": "c0lorize",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "simple node script to convert a text file to colors for motd or other irc ascii art",
 	"author": "z0",
 	"main": "c0lorize.js",
@@ -19,7 +19,8 @@
 		"motd"
 	],
 	"dependencies": {
-		"prompt": "~1.0.0"
+		"prompt": "~1.0.0",
+		"html-validator": "~5.0.0"
 	},
 	"preferGlobal": false,
 	"private": true,
